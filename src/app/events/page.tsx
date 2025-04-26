@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { FaMapMarkerAlt, FaCalendarAlt, FaTicketAlt, FaSearch, FaFilter } from 'react-icons/fa';
 import { EventCard } from '@/components/EventCard';
 import { EventFilter } from '@/components/EventFilter';
-import { Event } from '@/lib/events';
 
 const ultra = Ultra({
   weight: '400',
@@ -18,7 +17,7 @@ const poppins = Poppins({
   subsets: ['latin'],
 });
 
-interface Event {
+interface LocalEvent {
   id: string;
   title: string;
   description: string;
@@ -56,7 +55,7 @@ const eventTypes = [
 ];
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<LocalEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCity, setSelectedCity] = useState('All Cities');
