@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
+  let message = '';
   try {
-    const { message } = await request.json();
+    const body = await request.json();
+    message = body.message;
 
     // Check if we have an API key
     if (!process.env.OPENROUTER_API_KEY) {
@@ -74,7 +76,7 @@ export async function POST(request: Request) {
     };
 
     // Simple keyword matching for fallback responses
-    const messageToProcess = (await request.json()).message.toLowerCase();
+    const messageToProcess = message.toLowerCase();
     
     let selectedResponse = fallbackResponses.default[Math.floor(Math.random() * fallbackResponses.default.length)];
     
