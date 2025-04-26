@@ -1,4 +1,7 @@
 import { NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyBJOpd4d0lNfOXEiFu12zurePaeDBdthhw"; // (keep it secure later)
 
 export async function POST(request: Request) {
   let message = '';
@@ -6,47 +9,25 @@ export async function POST(request: Request) {
     const body = await request.json();
     message = body.message;
 
-    // Check if we have an API key
-    if (!process.env.OPENROUTER_API_KEY) {
-      throw new Error('API key not configured');
-    }
+    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://localhost:3000',
-      },
-      body: JSON.stringify({
-        model: 'mistralai/mistral-7b-instruct',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are Asha, a helpful and friendly AI assistant focused on women empowerment and career development. You provide detailed, accurate, and helpful responses.'
-          },
-          {
-            role: 'user',
-            content: message
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 1000,
-      }),
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-pro", // <--- Use correct model name
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to get response from OpenRouter');
-    }
+    const result = await model.generateContent({
+      contents: [
+        { role: "user", parts: [{ text: message }] }
+      ]
+    });
 
-    const data = await response.json();
-    const aiResponse = data.choices[0].message.content;
+    const response = result.response;
+    const aiResponse = response.text();
 
     return NextResponse.json({ response: aiResponse });
-  } catch (error) {
-    console.error('Error:', error);
-    
-    // Enhanced fallback response
+  } catch (error: any) {
+    console.error('Error occurred:', error.message || error);
+
     const fallbackResponses = {
       greeting: [
         "Hello! I'm Asha, your AI assistant. How can I help you today?",
@@ -75,11 +56,8 @@ export async function POST(request: Request) {
       ]
     };
 
-    // Simple keyword matching for fallback responses
     const messageToProcess = message.toLowerCase();
-    
     let selectedResponse = fallbackResponses.default[Math.floor(Math.random() * fallbackResponses.default.length)];
-    
     if (messageToProcess.includes('hello') || messageToProcess.includes('hi')) {
       selectedResponse = fallbackResponses.greeting[Math.floor(Math.random() * fallbackResponses.greeting.length)];
     } else if (messageToProcess.includes('career') || messageToProcess.includes('job')) {
@@ -92,4 +70,4 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ response: selectedResponse });
   }
-} 
+}
