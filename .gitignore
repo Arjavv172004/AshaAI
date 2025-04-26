@@ -1,2 +1,42 @@
-node_modules
-public/*.mp4 
+# Node modules (ignore all, not just one file)
+node_modules/
+
+# Build output
+.next/
+dist/
+build/
+
+# OS files
+.DS_Store
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Vercel
+.vercel/
+
+# Video/media files
+*.mp4
+*.mov
+*.avi
+*.mkv
+
+# Large data files
+*.csv
+*.tsv
+*.sqlite
+*.db
+
+# Coverage
+coverage/
+
+# Explicitly ignore these large files
+public/bgg.mp4
+node_modules/@next/swc-darwin-arm64/next-swc.darwin-arm64.node
